@@ -28,7 +28,7 @@ constexpr uint32_t kExtendedSlotCapacity = 810;
 constexpr uint32_t kExtendedTitleBufferCapacity = kExtendedSlotCapacity + 4;
 static_assert(kExtendedTitleBufferCapacity == 0x32e);
 constexpr const char *kProfileName = "USA-v277-b67deb8fb368";
-constexpr size_t kPatchCount = 87;
+constexpr size_t kPatchCount = 107;
 constexpr uint32_t kIconEvictionFunctionOffset = 0x000cef5c;
 constexpr uint32_t kTitleListBuildFunctionOffset = 0x000d57fc;
 constexpr uint32_t kLayoutIngestFunctionOffset = 0x001716dc;
@@ -146,6 +146,50 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
          0x3ba0032a, nullptr, 0},
         {"layout-reconcile-phase-four-count", 0x021731b8, 0x3b400168,
          0x3b40032a, nullptr, 0},
+        // The reconciliation scratch grid is a 60-row array of 60-cell
+        // records.  Fifty-four Menu pages can generate an outer coordinate
+        // above 59, so grow only the outer row allocation to 96.  Keep the
+        // established 0x400-byte row format and 60-cell inner dimension.
+        {"layout-grid-allocation-upper", 0x021643ac, 0x3c600001,
+         0x3c600002, nullptr, 0}, // lis r3,1 -> 2
+        {"layout-grid-allocation-lower", 0x021643b0, 0x3863f010,
+         0x38638010, nullptr, 0}, // 0xf010 -> 0x18010
+        {"layout-grid-constructor-upper", 0x0216fa04, 0x3fc00001,
+         0x3fc00002, nullptr, 0}, // lis r30,1 -> 2
+        {"layout-grid-constructor-lower", 0x0216fa0c, 0x3bdef000,
+         0x3bde8000, nullptr, 0}, // 0xf000 -> 0x18000
+        {"layout-grid-construction-row-count", 0x0216fa48, 0x3880003c,
+         0x38800060, nullptr, 0}, // 60 -> 96 rows
+        {"layout-grid-dirty-flag-upper", 0x0216fedc, 0x3d830001,
+         0x3d830002, nullptr, 0},
+        {"layout-grid-dirty-flag-lower", 0x0216fee4, 0x980cf008,
+         0x980c8008, nullptr, 0}, // +0xf008 -> +0x18008
+        {"layout-grid-phase-one-row-bound-a", 0x02172310, 0x2800003c,
+         0x28000060, nullptr, 0},
+        {"layout-grid-phase-one-row-bound-b", 0x02172468, 0x2805003c,
+         0x28050060, nullptr, 0},
+        {"layout-grid-phase-one-row-bound-c", 0x02172574, 0x2808003c,
+         0x28080060, nullptr, 0},
+        {"layout-grid-phase-one-row-bound-d", 0x02172654, 0x2800003c,
+         0x28000060, nullptr, 0},
+        {"layout-grid-phase-one-row-bound-e", 0x021726dc, 0x2806003c,
+         0x28060060, nullptr, 0},
+        {"layout-grid-phase-two-row-bound-a", 0x021727d0, 0x2800003c,
+         0x28000060, nullptr, 0},
+        {"layout-grid-phase-two-row-bound-b", 0x021728bc, 0x2800003c,
+         0x28000060, nullptr, 0},
+        {"layout-grid-phase-two-row-bound-c", 0x021729a4, 0x2809003c,
+         0x28090060, nullptr, 0},
+        {"layout-grid-phase-two-row-bound-d", 0x02172ac4, 0x280a003c,
+         0x280a0060, nullptr, 0},
+        {"layout-grid-phase-two-row-bound-e", 0x02172b7c, 0x2806003c,
+         0x28060060, nullptr, 0},
+        {"layout-grid-phase-two-row-bound-f", 0x02172c5c, 0x2809003c,
+         0x28090060, nullptr, 0},
+        {"layout-grid-phase-two-row-bound-g", 0x02172cb0, 0x280a003c,
+         0x280a0060, nullptr, 0},
+        {"layout-grid-phase-two-row-bound-h", 0x02172ce0, 0x280a003c,
+         0x280a0060, nullptr, 0},
         {"layout-page-upper-bound", 0x02173804, 0x2c1f0018,
          0x2c1f0036, nullptr, 0}, // 24 -> 54 pages
         {"layout-slot-product-check-one", 0x02173824, 0x2c000168,
