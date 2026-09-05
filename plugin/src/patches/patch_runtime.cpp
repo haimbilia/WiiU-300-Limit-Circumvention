@@ -28,7 +28,7 @@ constexpr uint32_t kExtendedSlotCapacity = 810;
 constexpr uint32_t kExtendedTitleBufferCapacity = kExtendedSlotCapacity + 4;
 static_assert(kExtendedTitleBufferCapacity == 0x32e);
 constexpr const char *kProfileName = "USA-v277-b67deb8fb368";
-constexpr size_t kPatchCount = 85;
+constexpr size_t kPatchCount = 84;
 constexpr uint32_t kIconEvictionFunctionOffset = 0x000cef5c;
 constexpr uint32_t kTitleListBuildFunctionOffset = 0x000d57fc;
 constexpr uint32_t kLayoutIngestFunctionOffset = 0x001716dc;
@@ -184,12 +184,6 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
          0x4842b281, 0x48000024, nullptr, 0}, // panic call -> store index
         {"page-indicator-deselect-out-of-range-noop", 0x02001be8,
          0x4842b21d, 0x48000024, nullptr, 0}, // panic call -> continue
-        // PageMany has 24 physical marker children.  Feed that cosmetic
-        // widget its real child count so the dots remain centered; its
-        // normalized scroll value still maps the full Menu range onto them.
-        // The logical page count and navigation continue to use all 54 pages.
-        {"page-indicator-compressed-visible-count", 0x021e3718,
-         0x7fe4fb78, 0x38800018, nullptr, 0}, // mr r4,r31 -> li r4,24
         // FUN_02274a0c copies the active Menu page count into launch state but
         // asserts unless (pages - 4) is below 21, i.e. at most 24 pages.
         // Raise the exclusive bound to 51 so all 54 pages are accepted.
