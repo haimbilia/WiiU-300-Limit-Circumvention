@@ -6,9 +6,9 @@ launching, and persistence while allowing more than 300 visible entries.
 
 ## Current status
 
-This is active hardware research, not a release build.
+`v0.1.0` is an experimental hardware-test release.
 
-- `v1.0.0-rc17` is confirmed working with 400 visible titles on real hardware.
+- `v0.1.0` is confirmed working with 400 visible titles on real hardware.
 - All 27 panels are navigable: the first 26 are full and the last has 10 titles.
 - A title on panel 27 launches, and returning to the complete Menu succeeds.
 - The internal model supports 405 slots / 27 pages. The cosmetic page indicator
@@ -24,6 +24,24 @@ men.rpx SHA:  b67deb8fb36889fd5451b89a5b1ce06b31abe341960c3bf1df84e9df4bbe1474
 
 Every instruction is checked before modification. Other Menu versions fail
 closed and remain unpatched.
+
+## Install
+
+Download `WiiUMenuTitleLimit-v0.1.0.wps` from the
+[v0.1.0 release](https://github.com/haimbilia/WiiU-300-Limit-Circumvention/releases/tag/v0.1.0)
+and copy it to:
+
+```text
+sd:/wiiu/environments/aroma/plugins/WiiUMenuTitleLimit.wps
+```
+
+This build supports only the exact USA Menu v277 identified above. Keep direct
+SD access available, reboot the console, and report your Menu region/version,
+real title count, visible panel count, and `WiiUMenuTitleLimit-status.log`.
+
+One launch/return test temporarily left the first three panels without native
+title icons while mock titles remained; rebooting restored every icon. Please
+report if this occurs with real installed titles.
 
 ## Build
 

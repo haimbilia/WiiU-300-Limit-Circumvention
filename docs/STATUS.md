@@ -20,11 +20,16 @@ The test set contains 378 mock WUHB titles plus 22 existing Menu entries.
 a title triggered assertion code 77 because `FUN_02274a0c` independently
 accepted at most 24 pages. `rc17` raises that validator to 27 pages.
 
-On hardware, `rc17` displayed all 400 titles across 27 navigable panels. A
-title on panel 27 launched successfully, and returning to the Menu restored all
-27 panels. The stock `PageMany` resource still exposes only 24 cosmetic marker
-children; bounds-safe patches prevent pages 25-27 from indexing nonexistent
-markers.
+On hardware, the patch released as `v0.1.0` displayed all 400 titles across 27
+navigable panels. A title on panel 27 launched successfully, and returning to
+the Menu restored all 27 panels. The stock `PageMany` resource still exposes
+only 24 cosmetic marker children; bounds-safe patches prevent pages 25-27 from
+indexing nonexistent markers.
+
+During one return-to-Menu cycle, the first three panels temporarily omitted
+native title icons while mock titles remained. Rebooting restored every icon.
+This transient refresh behavior is not yet explained and is a priority for
+real-title testing.
 
 ## Current limitations
 
@@ -36,7 +41,7 @@ markers.
   characterized before increasing the capacity again.
 - Folder persistence, Data Management, Quick Start, and long-run icon-cache
   behavior above 360 remain unproven.
-- No binary is published as a release.
+- `v0.1.0` is an experimental release; it is not declared production-safe.
 
 ## Next hardware tests
 
