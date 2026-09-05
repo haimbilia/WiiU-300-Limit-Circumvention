@@ -32,6 +32,7 @@ constexpr size_t kPatchCount = 107;
 constexpr uint32_t kIconEvictionFunctionOffset = 0x000cef5c;
 constexpr uint32_t kTitleListBuildFunctionOffset = 0x000d57fc;
 constexpr uint32_t kLayoutIngestFunctionOffset = 0x001716dc;
+constexpr uint32_t kLayoutCoordinateFunctionOffset = 0x00171d80;
 constexpr uint32_t kLayoutReconcileFunctionOffset = 0x00171f40;
 constexpr uint32_t kLayoutFinalizeFunctionOffset = 0x001736f8;
 constexpr uint32_t kModelOwnerFunctionOffset = 0x00166ab8;
@@ -374,6 +375,7 @@ std::array<bool, kPatchCount> sPatchState{};
 PatchedFunctionHandle sIconEvictionPatchHandle = 0;
 PatchedFunctionHandle sTitleListBuildPatchHandle = 0;
 PatchedFunctionHandle sLayoutIngestPatchHandle = 0;
+PatchedFunctionHandle sLayoutCoordinatePatchHandle = 0;
 PatchedFunctionHandle sLayoutReconcilePatchHandle = 0;
 PatchedFunctionHandle sLayoutFinalizePatchHandle = 0;
 PatchedFunctionHandle sModelOwnerPatchHandle = 0;
@@ -393,6 +395,7 @@ uint32_t sIconEvictionCalls = 0;
 uint32_t sIconEvictionFallbacks = 0;
 uint32_t sTitleListBuildCalls = 0;
 uint32_t sLayoutIngestCalls = 0;
+uint32_t sLayoutCoordinateRepairs = 0;
 uint32_t sLayoutReconcileCalls = 0;
 uint32_t sLayoutFinalizeCalls = 0;
 uint32_t sModelOwnerCalls = 0;
@@ -438,6 +441,22 @@ DECL_FUNCTION(void, TraceLayoutIngest, int param1) {
         writeStatusLog("trace=layout-ingest event=exit call=%u",
                        sLayoutIngestCalls - 1);
     }
+}
+
+DECL_FUNCTION(uint64_t, RepairLayoutCoordinate, int param1, uint32_t index) {
+    const uint64_t coordinate = real_RepairLayoutCoordinate(param1, index);
+    const uint32_t outer = static_cast<uint32_t>(coordinate);
+    if (outer != 0 && outer <= 96) {
+        return coordinate;
+    }
+
+    const uint32_t repair = sLayoutCoordinateRepairs++;
+    if (repair < 32) {
+        writeStatusLog("trace=layout-coordinate event=repair call=%u index=%u first=%08x outer=%08x fallback=1",
+                       repair, index, static_cast<uint32_t>(coordinate >> 32),
+                       outer);
+    }
+    return (coordinate & 0xffffffff00000000ULL) | 1ULL;
 }
 
 DECL_FUNCTION(void, TraceLayoutReconcile, int param1, uint32_t param2,
@@ -673,6 +692,13 @@ function_replacement_data_t sLayoutIngestPatch =
                 kLayoutIngestFunctionOffset, kUsaMenuVersion,
                 kUsaMenuVersion);
 
+function_replacement_data_t sLayoutCoordinatePatch =
+        REPLACE_FUNCTION_OF_EXECUTABLE_BY_ADDRESS_WITH_VERSION(
+                RepairLayoutCoordinate, kTargetTitleIds,
+                std::size(kTargetTitleIds), "men.rpx",
+                kLayoutCoordinateFunctionOffset, kUsaMenuVersion,
+                kUsaMenuVersion);
+
 function_replacement_data_t sLayoutReconcilePatch =
         REPLACE_FUNCTION_OF_EXECUTABLE_BY_ADDRESS_WITH_VERSION(
                 TraceLayoutReconcile, kTargetTitleIds,
@@ -740,6 +766,7 @@ void removeTracePatches() {
             &sModelOwnerPatchHandle,
             &sLayoutFinalizePatchHandle,
             &sLayoutReconcilePatchHandle,
+            &sLayoutCoordinatePatchHandle,
             &sLayoutIngestPatchHandle,
             &sTitleListBuildPatchHandle,
     };
@@ -754,6 +781,7 @@ void removeTracePatches() {
 bool installTracePatches() {
     sTitleListBuildCalls = 0;
     sLayoutIngestCalls = 0;
+    sLayoutCoordinateRepairs = 0;
     sLayoutReconcileCalls = 0;
     sLayoutFinalizeCalls = 0;
     sModelOwnerCalls = 0;
@@ -786,6 +814,9 @@ bool installTracePatches() {
                            "title-list-build") ||
         !installTracePatch(&sLayoutIngestPatch, &sLayoutIngestPatchHandle,
                            "layout-ingest") ||
+        !installTracePatch(&sLayoutCoordinatePatch,
+                           &sLayoutCoordinatePatchHandle,
+                           "layout-coordinate") ||
         !installTracePatch(&sLayoutReconcilePatch,
                            &sLayoutReconcilePatchHandle,
                            "layout-reconcile") ||
