@@ -10,7 +10,7 @@
     "sha256": "b67deb8fb36889fd5451b89a5b1ce06b31abe341960c3bf1df84e9df4bbe1474"
   },
   "canonicalTextBase": "02000000",
-  "targetSlotCapacity": 405,
+  "targetSlotCapacity": 510,
   "patches": [
     {
       "name": "layout-scratch-vector",
@@ -18,7 +18,7 @@
       "canonicalAddress": "021714bc",
       "textOffset": "001714bc",
       "original": "3880012c",
-      "replacement": "38800195",
+      "replacement": "388001fe",
       "signature": [
         { "delta": -4, "word": "387f001c" },
         { "delta": 0, "word": "3880012c" },
@@ -33,7 +33,7 @@
       "canonicalAddress": "0217385c",
       "textOffset": "0017385c",
       "original": "2000012c",
-      "replacement": "20000195",
+      "replacement": "200001fe",
       "signature": [
         { "delta": -4, "word": "38180002" },
         { "delta": 0, "word": "2000012c" },

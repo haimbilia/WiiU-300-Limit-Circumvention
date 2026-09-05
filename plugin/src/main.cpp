@@ -7,15 +7,15 @@
 #include <wups.h>
 
 WUPS_PLUGIN_NAME("Wii U Menu Title Limit");
-WUPS_PLUGIN_DESCRIPTION("Raises the USA Wii U Menu v277 software-slot limit to 405");
-WUPS_PLUGIN_VERSION("v1.0.0-rc17");
+WUPS_PLUGIN_DESCRIPTION("Raises the USA Wii U Menu v277 software-slot limit to 510");
+WUPS_PLUGIN_VERSION("v1.0.0-rc18");
 WUPS_PLUGIN_AUTHOR("Wii U Title Limit project contributors");
 WUPS_PLUGIN_LICENSE("BSD-2-Clause");
 
 WUPS_USE_WUT_DEVOPTAB();
 
 namespace {
-constexpr const char *kPluginVersion = "v1.0.0-rc17";
+constexpr const char *kPluginVersion = "v1.0.0-rc18";
 
 uint16_t getOwnTitleVersion(uint64_t fallbackTitleId, uint64_t *outTitleId) {
     if (outTitleId) {
