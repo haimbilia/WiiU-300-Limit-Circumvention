@@ -7,7 +7,7 @@ Updated: 2026-09-05
 - Target: USA Wii U Menu `0005001010040100`, version 277.
 - Exact `men.rpx` SHA-256:
   `b67deb8fb36889fd5451b89a5b1ce06b31abe341960c3bf1df84e9df4bbe1474`.
-- `v0.2.0` supports 810 slots / 54 navigable panels.
+- `v0.2.1` supports 810 slots / 54 navigable panels.
 - 801 visible items loaded: panels 1-53 were full and panel 54 held six.
 - A title launched and the complete Menu returned without an assertion or
   panic.
@@ -22,11 +22,12 @@ export Nintendo's fixed 360-record account-save arrays. This read and wrote
 through adjacent save fields, producing empty panels, duplicated Disc/folder
 icons, launch assertion 401, and a fatal garbage layout record at index 721.
 
-`v0.2.0` keeps live vectors and reconciliation at 810 while preserving the
+`v0.2.1` keeps live vectors and reconciliation at 810 while preserving the
 physical save arrays at 360 records. Entries above 360 are rebuilt through the
 normal title reconciliation path. The stock `PageMany` resource has only 24
-marker children, so its normalized position is displayed as a compressed,
-centered 24-dot bar.
+marker children. The widget retains the true 54-page logical count while its
+private marker geometry and update loops use the 24-child physical capacity,
+giving a compressed, centered 24-dot bar without corrupting refresh state.
 
 ## Current limitations
 

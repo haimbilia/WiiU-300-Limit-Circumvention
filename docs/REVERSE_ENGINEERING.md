@@ -28,8 +28,9 @@ The current plugin raises the coherent layout path to 810 slots, dependent
 304-entry buffers to 814, and page bounds to 54. It deliberately leaves the
 two fixed account-save arrays and their import/export loops at 360 records;
 extending those loops corrupts adjacent save fields. The cosmetic `PageMany`
-widget receives its physical count of 24 and maps normalized progress over all
-54 logical pages. The full checked patch list and rationale are in
+widget retains the real logical count of 54, while its private geometry and
+update helpers use the physical child count of 24 to map normalized progress.
+The full checked patch list and rationale are in
 `plugin/src/patches/patch_runtime.cpp`.
 
 ## Failure sequence that located the boundaries
@@ -50,7 +51,8 @@ widget receives its physical count of 24 and maps normalized progress over all
 | rc19-rc20 | 800-title startup stopped | corrupt record 721 at `0x02172334` |
 | rc21 | 54 panels with gaps/duplicates; launch stopped | assertion 401 |
 | rc22 | 801 items, 54 panels, launch + return passed | none |
-| rc23 / v0.2.0 | centered compressed 24-dot indicator | none |
+| rc23 / v0.2.0 | centered dots; scrolling refresh state inconsistent | assertion 245 via `0x02148288` |
+| v0.2.1 | 801 items; full scroll + late-page launch + return passed | none |
 
 The assertion and panic hooks log the runtime link register. Always subtract
 the actual loaded text offset before opening the canonical address in Ghidra.
