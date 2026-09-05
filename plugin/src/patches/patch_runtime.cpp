@@ -28,7 +28,7 @@ constexpr uint32_t kExtendedSlotCapacity = 810;
 constexpr uint32_t kExtendedTitleBufferCapacity = kExtendedSlotCapacity + 4;
 static_assert(kExtendedTitleBufferCapacity == 0x32e);
 constexpr const char *kProfileName = "USA-v277-b67deb8fb368";
-constexpr size_t kPatchCount = 84;
+constexpr size_t kPatchCount = 89;
 constexpr uint32_t kIconEvictionFunctionOffset = 0x000cef5c;
 constexpr uint32_t kTitleListBuildFunctionOffset = 0x000d57fc;
 constexpr uint32_t kLayoutIngestFunctionOffset = 0x001716dc;
@@ -167,6 +167,19 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
          0x3880032a, nullptr, 0},
         {"banner-vector-construction-count", 0x021643ec, 0x3ba00168,
          0x3ba0032a, nullptr, 0},
+        // Keep the PageMany widget's stored logical count at 54 so Menu-side
+        // refresh validation remains coherent.  Only its private geometry and
+        // update loops should use the 24 physical marker children.
+        {"page-indicator-even-geometry-physical-count", 0x020017cc,
+         0x819d00f0, 0x819d00fc, nullptr, 0}, // lwz r12,f0 -> fc
+        {"page-indicator-odd-geometry-physical-count", 0x02001914,
+         0x819e00f0, 0x819e00fc, nullptr, 0}, // lwz r12,f0 -> fc
+        {"page-indicator-update-initial-physical-count", 0x02001a08,
+         0x817e00f0, 0x817e00fc, nullptr, 0}, // lwz r11,f0 -> fc
+        {"page-indicator-update-loop-physical-count", 0x02001a8c,
+         0x817e00f0, 0x817e00fc, nullptr, 0}, // lwz r11,f0 -> fc
+        {"page-indicator-update-rejoin-physical-count", 0x02001ab4,
+         0x817e00f0, 0x817e00fc, nullptr, 0}, // lwz r11,f0 -> fc
         // PageMany has only 24 prebuilt page-marker children. Keep the real
         // requested page count stored in the widget, but stop its cosmetic
         // child-initialization loop at the vector capacity instead of taking
