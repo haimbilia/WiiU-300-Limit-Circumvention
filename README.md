@@ -8,13 +8,11 @@ launching, and persistence while allowing more than 300 visible entries.
 
 This is active hardware research, not a release build.
 
-- 360 titles are confirmed working across 24 full panels on a real Wii U.
-- Launching a title and returning to the Menu works at 360 titles.
-- The current branch extends the internal model to 405 slots / 27 pages.
-- A 400-title boot reaches the Menu, but the stock UI exposes only 24 page
-  markers. The logical page count is 27.
-- `v1.0.0-rc17` raises the launch-state page validator from 24 to 27 and is
-  awaiting hardware results.
+- `v1.0.0-rc17` is confirmed working with 400 visible titles on real hardware.
+- All 27 panels are navigable: the first 26 are full and the last has 10 titles.
+- A title on panel 27 launches, and returning to the complete Menu succeeds.
+- The internal model supports 405 slots / 27 pages. The cosmetic page indicator
+  still has only its stock 24 markers.
 
 The patch currently supports only this exact Menu executable:
 
@@ -59,12 +57,11 @@ above. Keep Aroma safe mode or direct SD access available during testing.
 
 The most useful next contributions are:
 
-1. Determine whether pages 25-27 are navigable even though the stock
-   `PageMany` resource contains only 24 marker children.
-2. Extend the title-launch resolver's two 360-record tables so titles 361-405
-   can be launched safely.
-3. Test folders, layout persistence, Data Management, and launch/return paths
-   above title 360.
+1. Test folders, layout persistence, Data Management, Quick Start, and
+   long-running icon-cache behavior above title 360.
+2. Test the unoccupied 401-405 slots and larger title sets to locate the next
+   coherent capacity boundary.
+3. Explain or replace the stock 24-marker page indicator for pages 25-27.
 4. Port the exact checked patch set to other regional Menu binaries.
 
 See [docs/STATUS.md](docs/STATUS.md) for the hardware evidence and

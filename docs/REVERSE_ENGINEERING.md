@@ -42,6 +42,7 @@ and rationale are in `plugin/src/patches/patch_runtime.cpp`.
 | rc14 | init passed | page-child update panic at `0x02001a60` |
 | rc15 | child accesses skipped | assertion 108 at `0x02001ad8` |
 | rc16 | Menu rendered, launch attempted | assertion 77 at `0x02274a74` |
+| rc17 | 400 titles, 27 panels, panel-27 launch + return passed | none |
 
 The assertion and panic hooks log the runtime link register. Always subtract
 the actual loaded text offset before opening the canonical address in Ghidra.
