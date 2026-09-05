@@ -28,11 +28,10 @@ constexpr uint32_t kExtendedSlotCapacity = 810;
 constexpr uint32_t kExtendedTitleBufferCapacity = kExtendedSlotCapacity + 4;
 static_assert(kExtendedTitleBufferCapacity == 0x32e);
 constexpr const char *kProfileName = "USA-v277-b67deb8fb368";
-constexpr size_t kPatchCount = 107;
+constexpr size_t kPatchCount = 84;
 constexpr uint32_t kIconEvictionFunctionOffset = 0x000cef5c;
 constexpr uint32_t kTitleListBuildFunctionOffset = 0x000d57fc;
 constexpr uint32_t kLayoutIngestFunctionOffset = 0x001716dc;
-constexpr uint32_t kLayoutCoordinateFunctionOffset = 0x00171d80;
 constexpr uint32_t kLayoutReconcileFunctionOffset = 0x00171f40;
 constexpr uint32_t kLayoutFinalizeFunctionOffset = 0x001736f8;
 constexpr uint32_t kModelOwnerFunctionOffset = 0x00166ab8;
@@ -129,14 +128,11 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
          nullptr, 0},
         {"layout-load-vector-one-size-check", 0x02171874, 0x2c050168,
          0x2c05032a, nullptr, 0},
-        {"layout-load-vector-one-count", 0x02171898, 0x3be00168,
-         0x3be0032a, nullptr, 0},
         {"layout-load-vector-two-size-check", 0x02171940, 0x2c060168,
          0x2c06032a, nullptr, 0},
-        {"layout-load-vector-two-count", 0x02171964, 0x3bc00168,
-         0x3bc0032a, nullptr, 0},
-        {"layout-save-vector-count", 0x02171a3c, 0x3b600168,
-         0x3b60032a, nullptr, 0},
+        // The account-save layout contains exactly 360 records.  Keep both
+        // import loops and the matching export loop at their stock count;
+        // extending them reads/writes through the adjacent save fields.
         {"layout-reconcile-phase-zero-count", 0x02171f54, 0x3b600168,
          0x3b60032a, nullptr, 0},
         {"layout-reconcile-phase-one-count", 0x021722cc, 0x3a800168,
@@ -147,50 +143,6 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
          0x3ba0032a, nullptr, 0},
         {"layout-reconcile-phase-four-count", 0x021731b8, 0x3b400168,
          0x3b40032a, nullptr, 0},
-        // The reconciliation scratch grid is a 60-row array of 60-cell
-        // records.  Fifty-four Menu pages can generate an outer coordinate
-        // above 59, so grow only the outer row allocation to 96.  Keep the
-        // established 0x400-byte row format and 60-cell inner dimension.
-        {"layout-grid-allocation-upper", 0x021643ac, 0x3c600001,
-         0x3c600002, nullptr, 0}, // lis r3,1 -> 2
-        {"layout-grid-allocation-lower", 0x021643b0, 0x3863f010,
-         0x38638010, nullptr, 0}, // 0xf010 -> 0x18010
-        {"layout-grid-constructor-upper", 0x0216fa04, 0x3fc00001,
-         0x3fc00002, nullptr, 0}, // lis r30,1 -> 2
-        {"layout-grid-constructor-lower", 0x0216fa0c, 0x3bdef000,
-         0x3bde8000, nullptr, 0}, // 0xf000 -> 0x18000
-        {"layout-grid-construction-row-count", 0x0216fa48, 0x3880003c,
-         0x38800060, nullptr, 0}, // 60 -> 96 rows
-        {"layout-grid-dirty-flag-upper", 0x0216fedc, 0x3d830001,
-         0x3d830002, nullptr, 0},
-        {"layout-grid-dirty-flag-lower", 0x0216fee4, 0x980cf008,
-         0x980c8008, nullptr, 0}, // +0xf008 -> +0x18008
-        {"layout-grid-phase-one-row-bound-a", 0x02172310, 0x2800003c,
-         0x28000060, nullptr, 0},
-        {"layout-grid-phase-one-row-bound-b", 0x02172468, 0x2805003c,
-         0x28050060, nullptr, 0},
-        {"layout-grid-phase-one-row-bound-c", 0x02172574, 0x2808003c,
-         0x28080060, nullptr, 0},
-        {"layout-grid-phase-one-row-bound-d", 0x02172654, 0x2800003c,
-         0x28000060, nullptr, 0},
-        {"layout-grid-phase-one-row-bound-e", 0x021726dc, 0x2806003c,
-         0x28060060, nullptr, 0},
-        {"layout-grid-phase-two-row-bound-a", 0x021727d0, 0x2800003c,
-         0x28000060, nullptr, 0},
-        {"layout-grid-phase-two-row-bound-b", 0x021728bc, 0x2800003c,
-         0x28000060, nullptr, 0},
-        {"layout-grid-phase-two-row-bound-c", 0x021729a4, 0x2809003c,
-         0x28090060, nullptr, 0},
-        {"layout-grid-phase-two-row-bound-d", 0x02172ac4, 0x280a003c,
-         0x280a0060, nullptr, 0},
-        {"layout-grid-phase-two-row-bound-e", 0x02172b7c, 0x2806003c,
-         0x28060060, nullptr, 0},
-        {"layout-grid-phase-two-row-bound-f", 0x02172c5c, 0x2809003c,
-         0x28090060, nullptr, 0},
-        {"layout-grid-phase-two-row-bound-g", 0x02172cb0, 0x280a003c,
-         0x280a0060, nullptr, 0},
-        {"layout-grid-phase-two-row-bound-h", 0x02172ce0, 0x280a003c,
-         0x280a0060, nullptr, 0},
         {"layout-page-upper-bound", 0x02173804, 0x2c1f0018,
          0x2c1f0036, nullptr, 0}, // 24 -> 54 pages
         {"layout-slot-product-check-one", 0x02173824, 0x2c000168,
@@ -375,7 +327,6 @@ std::array<bool, kPatchCount> sPatchState{};
 PatchedFunctionHandle sIconEvictionPatchHandle = 0;
 PatchedFunctionHandle sTitleListBuildPatchHandle = 0;
 PatchedFunctionHandle sLayoutIngestPatchHandle = 0;
-PatchedFunctionHandle sLayoutCoordinatePatchHandle = 0;
 PatchedFunctionHandle sLayoutReconcilePatchHandle = 0;
 PatchedFunctionHandle sLayoutFinalizePatchHandle = 0;
 PatchedFunctionHandle sModelOwnerPatchHandle = 0;
@@ -395,7 +346,6 @@ uint32_t sIconEvictionCalls = 0;
 uint32_t sIconEvictionFallbacks = 0;
 uint32_t sTitleListBuildCalls = 0;
 uint32_t sLayoutIngestCalls = 0;
-uint32_t sLayoutCoordinateRepairs = 0;
 uint32_t sLayoutReconcileCalls = 0;
 uint32_t sLayoutFinalizeCalls = 0;
 uint32_t sModelOwnerCalls = 0;
@@ -441,22 +391,6 @@ DECL_FUNCTION(void, TraceLayoutIngest, int param1) {
         writeStatusLog("trace=layout-ingest event=exit call=%u",
                        sLayoutIngestCalls - 1);
     }
-}
-
-DECL_FUNCTION(uint64_t, RepairLayoutCoordinate, int param1, uint32_t index) {
-    const uint64_t coordinate = real_RepairLayoutCoordinate(param1, index);
-    const uint32_t outer = static_cast<uint32_t>(coordinate);
-    if (outer != 0 && outer <= 96) {
-        return coordinate;
-    }
-
-    const uint32_t repair = sLayoutCoordinateRepairs++;
-    if (repair < 32) {
-        writeStatusLog("trace=layout-coordinate event=repair call=%u index=%u first=%08x outer=%08x fallback=1",
-                       repair, index, static_cast<uint32_t>(coordinate >> 32),
-                       outer);
-    }
-    return (coordinate & 0xffffffff00000000ULL) | 1ULL;
 }
 
 DECL_FUNCTION(void, TraceLayoutReconcile, int param1, uint32_t param2,
@@ -692,13 +626,6 @@ function_replacement_data_t sLayoutIngestPatch =
                 kLayoutIngestFunctionOffset, kUsaMenuVersion,
                 kUsaMenuVersion);
 
-function_replacement_data_t sLayoutCoordinatePatch =
-        REPLACE_FUNCTION_OF_EXECUTABLE_BY_ADDRESS_WITH_VERSION(
-                RepairLayoutCoordinate, kTargetTitleIds,
-                std::size(kTargetTitleIds), "men.rpx",
-                kLayoutCoordinateFunctionOffset, kUsaMenuVersion,
-                kUsaMenuVersion);
-
 function_replacement_data_t sLayoutReconcilePatch =
         REPLACE_FUNCTION_OF_EXECUTABLE_BY_ADDRESS_WITH_VERSION(
                 TraceLayoutReconcile, kTargetTitleIds,
@@ -766,7 +693,6 @@ void removeTracePatches() {
             &sModelOwnerPatchHandle,
             &sLayoutFinalizePatchHandle,
             &sLayoutReconcilePatchHandle,
-            &sLayoutCoordinatePatchHandle,
             &sLayoutIngestPatchHandle,
             &sTitleListBuildPatchHandle,
     };
@@ -781,7 +707,6 @@ void removeTracePatches() {
 bool installTracePatches() {
     sTitleListBuildCalls = 0;
     sLayoutIngestCalls = 0;
-    sLayoutCoordinateRepairs = 0;
     sLayoutReconcileCalls = 0;
     sLayoutFinalizeCalls = 0;
     sModelOwnerCalls = 0;
@@ -814,9 +739,6 @@ bool installTracePatches() {
                            "title-list-build") ||
         !installTracePatch(&sLayoutIngestPatch, &sLayoutIngestPatchHandle,
                            "layout-ingest") ||
-        !installTracePatch(&sLayoutCoordinatePatch,
-                           &sLayoutCoordinatePatchHandle,
-                           "layout-coordinate") ||
         !installTracePatch(&sLayoutReconcilePatch,
                            &sLayoutReconcilePatchHandle,
                            "layout-reconcile") ||
