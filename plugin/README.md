@@ -16,5 +16,5 @@ Build from the repository root:
 ./scripts/build-plugin.ps1 -Clean -Stage Production -AcknowledgeHardwareRisk
 ```
 
-This produces an experimental hardware-test artifact under `plugin/lab/`.
-There is no supported release binary yet.
+This produces the release-equivalent artifact under `plugin/lab/`. Published
+binaries are attached to the matching GitHub release.

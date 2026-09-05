@@ -24,10 +24,13 @@ own model. The known chain is:
 - `FUN_02274a0c` separately validates a maximum of 24 pages and searches two
   fixed 360-record launch tables.
 
-The current plugin raises the coherent layout path to 405 slots, dependent
-304-entry buffers to 409, page bounds to 27, and prevents the cosmetic marker
-widget from indexing beyond its 24 real children. The full checked patch list
-and rationale are in `plugin/src/patches/patch_runtime.cpp`.
+The current plugin raises the coherent layout path to 810 slots, dependent
+304-entry buffers to 814, and page bounds to 54. It deliberately leaves the
+two fixed account-save arrays and their import/export loops at 360 records;
+extending those loops corrupts adjacent save fields. The cosmetic `PageMany`
+widget receives its physical count of 24 and maps normalized progress over all
+54 logical pages. The full checked patch list and rationale are in
+`plugin/src/patches/patch_runtime.cpp`.
 
 ## Failure sequence that located the boundaries
 
@@ -43,6 +46,11 @@ and rationale are in `plugin/src/patches/patch_runtime.cpp`.
 | rc15 | child accesses skipped | assertion 108 at `0x02001ad8` |
 | rc16 | Menu rendered, launch attempted | assertion 77 at `0x02274a74` |
 | rc17 | 400 titles, 27 panels, panel-27 launch + return passed | none |
+| rc18 | 500 titles, 34 panels, launch + return passed | none |
+| rc19-rc20 | 800-title startup stopped | corrupt record 721 at `0x02172334` |
+| rc21 | 54 panels with gaps/duplicates; launch stopped | assertion 401 |
+| rc22 | 801 items, 54 panels, launch + return passed | none |
+| rc23 / v0.2.0 | centered compressed 24-dot indicator | none |
 
 The assertion and panic hooks log the runtime link register. Always subtract
 the actual loaded text offset before opening the canonical address in Ghidra.
