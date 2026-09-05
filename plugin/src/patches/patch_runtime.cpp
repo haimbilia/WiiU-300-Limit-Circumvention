@@ -24,9 +24,9 @@ namespace {
 constexpr uint64_t kUsaMenuTitleId = 0x0005001010040100ULL;
 constexpr uint16_t kUsaMenuVersion = 277;
 constexpr uint32_t kCanonicalTextBase = 0x02000000;
-constexpr uint32_t kExtendedSlotCapacity = 510;
+constexpr uint32_t kExtendedSlotCapacity = 810;
 constexpr uint32_t kExtendedTitleBufferCapacity = kExtendedSlotCapacity + 4;
-static_assert(kExtendedTitleBufferCapacity == 0x202);
+static_assert(kExtendedTitleBufferCapacity == 0x32e);
 constexpr const char *kProfileName = "USA-v277-b67deb8fb368";
 constexpr size_t kPatchCount = 87;
 constexpr uint32_t kIconEvictionFunctionOffset = 0x000cef5c;
@@ -91,7 +91,7 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
                 "layout-scratch-vector",
                 0x021714bc,
                 0x3880012c, // li r4, 300
-                0x388001fe, // li r4, 510
+                0x3880032a, // li r4, 810
                 kScratchVectorSignature,
                 std::size(kScratchVectorSignature),
         },
@@ -99,77 +99,77 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
                 "layout-full-flag",
                 0x0217385c,
                 0x2000012c, // subfic r0, r0, 300
-                0x200001fe, // subfic r0, r0, 510
+                0x2000032a, // subfic r0, r0, 810
                 kFullFlagSignature,
                 std::size(kFullFlagSignature),
         },
         // The stock layout owns three 360-record vectors and many loops that
-        // traverse them. Raise the complete coherent layout path to 34 pages
-        // (510 slots), including page validation and lookup/count helpers.
+        // traverse them. Raise the complete coherent layout path to 54 pages
+        // (810 slots), including page validation and lookup/count helpers.
         {"layout-vector-zero-init-count", 0x02171278, 0x3ba00168,
-         0x3ba001fe, nullptr, 0},
+         0x3ba0032a, nullptr, 0},
         {"layout-vector-two-init-count", 0x02171334, 0x3ba00168,
-         0x3ba001fe, nullptr, 0},
+         0x3ba0032a, nullptr, 0},
         {"layout-vector-one-init-count", 0x021713f0, 0x3ba00168,
-         0x3ba001fe, nullptr, 0},
+         0x3ba0032a, nullptr, 0},
         {"layout-vector-zero-capacity", 0x021714a8, 0x38800168,
-         0x388001fe, nullptr, 0},
+         0x3880032a, nullptr, 0},
         {"layout-vector-one-capacity", 0x021714d4, 0x38800168,
-         0x388001fe, nullptr, 0},
+         0x3880032a, nullptr, 0},
         {"layout-vector-two-capacity", 0x021714ec, 0x38800168,
-         0x388001fe, nullptr, 0},
+         0x3880032a, nullptr, 0},
         {"layout-reset-vector-one-count", 0x0217153c, 0x3b800168,
-         0x3b8001fe, nullptr, 0},
+         0x3b80032a, nullptr, 0},
         {"layout-reset-vector-two-count", 0x021715c8, 0x3b800168,
-         0x3b8001fe, nullptr, 0},
+         0x3b80032a, nullptr, 0},
         {"layout-reset-vector-zero-count", 0x02171644, 0x3b800168,
-         0x3b8001fe, nullptr, 0},
-        {"layout-ingest-count", 0x02171708, 0x3b000168, 0x3b0001fe,
+         0x3b80032a, nullptr, 0},
+        {"layout-ingest-count", 0x02171708, 0x3b000168, 0x3b00032a,
          nullptr, 0},
         {"layout-load-vector-one-size-check", 0x02171874, 0x2c050168,
-         0x2c0501fe, nullptr, 0},
+         0x2c05032a, nullptr, 0},
         {"layout-load-vector-one-count", 0x02171898, 0x3be00168,
-         0x3be001fe, nullptr, 0},
+         0x3be0032a, nullptr, 0},
         {"layout-load-vector-two-size-check", 0x02171940, 0x2c060168,
-         0x2c0601fe, nullptr, 0},
+         0x2c06032a, nullptr, 0},
         {"layout-load-vector-two-count", 0x02171964, 0x3bc00168,
-         0x3bc001fe, nullptr, 0},
+         0x3bc0032a, nullptr, 0},
         {"layout-save-vector-count", 0x02171a3c, 0x3b600168,
-         0x3b6001fe, nullptr, 0},
+         0x3b60032a, nullptr, 0},
         {"layout-reconcile-phase-zero-count", 0x02171f54, 0x3b600168,
-         0x3b6001fe, nullptr, 0},
+         0x3b60032a, nullptr, 0},
         {"layout-reconcile-phase-one-count", 0x021722cc, 0x3a800168,
-         0x3a8001fe, nullptr, 0},
+         0x3a80032a, nullptr, 0},
         {"layout-reconcile-phase-two-count", 0x02172788, 0x3a600168,
-         0x3a6001fe, nullptr, 0},
+         0x3a60032a, nullptr, 0},
         {"layout-reconcile-phase-three-count", 0x02172d88, 0x3ba00168,
-         0x3ba001fe, nullptr, 0},
+         0x3ba0032a, nullptr, 0},
         {"layout-reconcile-phase-four-count", 0x021731b8, 0x3b400168,
-         0x3b4001fe, nullptr, 0},
+         0x3b40032a, nullptr, 0},
         {"layout-page-upper-bound", 0x02173804, 0x2c1f0018,
-         0x2c1f0022, nullptr, 0}, // 24 -> 34 pages
+         0x2c1f0036, nullptr, 0}, // 24 -> 54 pages
         {"layout-slot-product-check-one", 0x02173824, 0x2c000168,
-         0x2c0001fe, nullptr, 0},
+         0x2c00032a, nullptr, 0},
         {"layout-page-clamp-check", 0x02173834, 0x2c0c0018,
-         0x2c0c0022, nullptr, 0},
+         0x2c0c0036, nullptr, 0},
         {"layout-page-clamp-value", 0x0217383c, 0x39800018,
-         0x39800022, nullptr, 0},
+         0x39800036, nullptr, 0},
         {"layout-slot-product-check-two", 0x02173844, 0x2c000168,
-         0x2c0001fe, nullptr, 0},
+         0x2c00032a, nullptr, 0},
         {"layout-title-lookup-count", 0x02173bd4, 0x3b600168,
-         0x3b6001fe, nullptr, 0},
+         0x3b60032a, nullptr, 0},
         {"layout-valid-title-count", 0x02173c78, 0x3b800168,
-         0x3b8001fe, nullptr, 0},
+         0x3b80032a, nullptr, 0},
         {"layout-valid-title-full-check", 0x02173d74, 0x6ba90168,
-         0x6ba901fe, nullptr, 0},
+         0x6ba9032a, nullptr, 0},
         // FUN_0216436c owns a separate 360-entry banner/model vector used
         // while constructing the Menu scene. Keep it aligned with the
-        // expanded 510-slot layout so all 34 pages have backing
+        // expanded 810-slot layout so all 54 pages have backing
         // records too.
         {"banner-vector-capacity", 0x021643e0, 0x38800168,
-         0x388001fe, nullptr, 0},
+         0x3880032a, nullptr, 0},
         {"banner-vector-construction-count", 0x021643ec, 0x3ba00168,
-         0x3ba001fe, nullptr, 0},
+         0x3ba0032a, nullptr, 0},
         // PageMany has only 24 prebuilt page-marker children. Keep the real
         // requested page count stored in the widget, but stop its cosmetic
         // child-initialization loop at the vector capacity instead of taking
@@ -189,122 +189,122 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
          0x4842b21d, 0x48000024, nullptr, 0}, // panic call -> continue
         // FUN_02274a0c copies the active Menu page count into launch state but
         // asserts unless (pages - 4) is below 21, i.e. at most 24 pages.
-        // Raise the exclusive bound to 31 so all 34 pages are accepted.
+        // Raise the exclusive bound to 51 so all 54 pages are accepted.
         {"launch-state-page-count-bound", 0x02274a60, 0x28050015,
-         0x2805001f, nullptr, 0},
+         0x28050033, nullptr, 0},
         // FUN_02179a24 constructs the destination record vector consumed by
         // FUN_02179f8c/FUN_0217a120. Keep its size in lockstep with the
         // enlarged temporary title-id buffers below.
-        {"title-record-vector-capacity", 0x02179a40, 0x38800130, 0x38800202,
-         nullptr, 0}, // li r4,304 -> 514
+        {"title-record-vector-capacity", 0x02179a40, 0x38800130, 0x3880032e,
+         nullptr, 0}, // li r4,304 -> 814
         {"title-record-construction-count", 0x02179a50, 0x3bc00130,
-         0x3bc00202, nullptr, 0}, // li r30,304 -> 514
+         0x3bc0032e, nullptr, 0}, // li r30,304 -> 814
         // FUN_02179f8c owns an inline 304-entry title-id array at sp+0x8.
-        // Grow its frame by 210 * 8 bytes and move ABI save slots above it.
-        {"refresh-frame-allocate", 0x02179f90, 0x9421f668, 0x9421efd8,
-         nullptr, 0}, // stwu r1,-0x998(r1) -> -0x1028
-        {"refresh-save-r29", 0x02179f94, 0x93a1098c, 0x93a1101c,
+        // Grow its frame by 510 * 8 bytes and move ABI save slots above it.
+        {"refresh-frame-allocate", 0x02179f90, 0x9421f668, 0x9421e678,
+         nullptr, 0}, // stwu r1,-0x998(r1) -> -0x1988
+        {"refresh-save-r29", 0x02179f94, 0x93a1098c, 0x93a1197c,
          nullptr, 0},
-        {"refresh-save-r30", 0x02179f98, 0x93c10990, 0x93c11020,
+        {"refresh-save-r30", 0x02179f98, 0x93c10990, 0x93c11980,
          nullptr, 0},
-        {"refresh-save-r31", 0x02179f9c, 0x93e10994, 0x93e11024,
+        {"refresh-save-r31", 0x02179f9c, 0x93e10994, 0x93e11984,
          nullptr, 0},
-        {"refresh-save-lr", 0x02179fa4, 0x9001099c, 0x9001102c,
+        {"refresh-save-lr", 0x02179fa4, 0x9001099c, 0x9001198c,
          nullptr, 0},
-        {"refresh-buffer-capacity", 0x02179fd8, 0x38800130, 0x38800202,
-         nullptr, 0}, // li r4,304 -> 514
-        {"refresh-restore-r29", 0x0217a078, 0x83a1098c, 0x83a1101c,
+        {"refresh-buffer-capacity", 0x02179fd8, 0x38800130, 0x3880032e,
+         nullptr, 0}, // li r4,304 -> 814
+        {"refresh-restore-r29", 0x0217a078, 0x83a1098c, 0x83a1197c,
          nullptr, 0},
-        {"refresh-restore-lr", 0x0217a07c, 0x8001099c, 0x8001102c,
+        {"refresh-restore-lr", 0x0217a07c, 0x8001099c, 0x8001198c,
          nullptr, 0},
-        {"refresh-restore-r30", 0x0217a080, 0x83c10990, 0x83c11020,
+        {"refresh-restore-r30", 0x0217a080, 0x83c10990, 0x83c11980,
          nullptr, 0},
-        {"refresh-restore-r31", 0x0217a088, 0x83e10994, 0x83e11024,
+        {"refresh-restore-r31", 0x0217a088, 0x83e10994, 0x83e11984,
          nullptr, 0},
-        {"refresh-frame-release", 0x0217a08c, 0x38210998, 0x38211028,
+        {"refresh-frame-release", 0x0217a08c, 0x38210998, 0x38211988,
          nullptr, 0},
 
         // FUN_021699f0 converts title IDs for the BOSS new-arrival service in
         // a third 304-entry stack array. Enlarge its frame and both bounds.
-        {"new-arrival-frame-allocate", 0x021699f0, 0x9421f650, 0x9421efc0,
-         nullptr, 0}, // stwu r1,-0x9b0(r1) -> -0x1040
+        {"new-arrival-frame-allocate", 0x021699f0, 0x9421f650, 0x9421e660,
+         nullptr, 0}, // stwu r1,-0x9b0(r1) -> -0x19a0
         {"new-arrival-save-registers", 0x021699f8, 0xbf010990,
-         0xbf011020, nullptr, 0},
-        {"new-arrival-input-bound", 0x02169a04, 0x281c0130, 0x281c0202,
-         nullptr, 0}, // cmplwi r28,304 -> 514
-        {"new-arrival-save-lr", 0x02169a10, 0x900109b4, 0x90011044,
+         0xbf011980, nullptr, 0},
+        {"new-arrival-input-bound", 0x02169a04, 0x281c0130, 0x281c032e,
+         nullptr, 0}, // cmplwi r28,304 -> 814
+        {"new-arrival-save-lr", 0x02169a10, 0x900109b4, 0x900119a4,
          nullptr, 0},
-        {"new-arrival-array-count", 0x02169a28, 0x38800130, 0x38800202,
-         nullptr, 0}, // li r4,304 -> 514
+        {"new-arrival-array-count", 0x02169a28, 0x38800130, 0x3880032e,
+         nullptr, 0}, // li r4,304 -> 814
         {"new-arrival-restore-registers-failure", 0x02169b0c, 0xbb010990,
-         0xbb011020, nullptr, 0},
+         0xbb011980, nullptr, 0},
         {"new-arrival-restore-lr-failure", 0x02169b10, 0x800109b4,
-         0x80011044, nullptr, 0},
+         0x800119a4, nullptr, 0},
         {"new-arrival-frame-release-failure", 0x02169b18, 0x382109b0,
-         0x38211040, nullptr, 0},
+         0x382119a0, nullptr, 0},
         {"new-arrival-restore-registers-success", 0x02169b24, 0xbb010990,
-         0xbb011020, nullptr, 0},
+         0xbb011980, nullptr, 0},
         {"new-arrival-restore-lr-success", 0x02169b28, 0x800109b4,
-         0x80011044, nullptr, 0},
+         0x800119a4, nullptr, 0},
         {"new-arrival-frame-release-success", 0x02169b30, 0x382109b0,
-         0x38211040, nullptr, 0},
+         0x382119a0, nullptr, 0},
 
         // FUN_0217a120 owns a byte-per-title result array followed by the
-        // title-id array. Shift the latter by 224 bytes, enlarge it by 1680,
+        // title-id array. Shift the latter by 512 bytes, enlarge it by 4080,
         // and move the ABI save area above both expanded arrays.
-        {"startup-frame-allocate", 0x0217a124, 0x9421f538, 0x9421edc8,
-         nullptr, 0}, // stwu r1,-0xac8(r1) -> -0x1238
-        {"startup-save-r29", 0x0217a128, 0x93a10abc, 0x93a1122c,
+        {"startup-frame-allocate", 0x0217a124, 0x9421f538, 0x9421e348,
+         nullptr, 0}, // stwu r1,-0xac8(r1) -> -0x1cb8
+        {"startup-save-r29", 0x0217a128, 0x93a10abc, 0x93a11cac,
          nullptr, 0},
-        {"startup-save-r28", 0x0217a12c, 0x93810ab8, 0x93811228,
+        {"startup-save-r28", 0x0217a12c, 0x93810ab8, 0x93811ca8,
          nullptr, 0},
-        {"startup-save-r30", 0x0217a130, 0x93c10ac0, 0x93c11230,
+        {"startup-save-r30", 0x0217a130, 0x93c10ac0, 0x93c11cb0,
          nullptr, 0},
-        {"startup-save-r31", 0x0217a134, 0x93e10ac4, 0x93e11234,
+        {"startup-save-r31", 0x0217a134, 0x93e10ac4, 0x93e11cb4,
          nullptr, 0},
-        {"startup-save-lr", 0x0217a13c, 0x90010acc, 0x9001123c,
+        {"startup-save-lr", 0x0217a13c, 0x90010acc, 0x90011cbc,
          nullptr, 0},
         {"startup-title-buffer-base", 0x0217a160, 0x3ba10138,
-         0x3ba10218, nullptr, 0},
-        {"startup-buffer-capacity", 0x0217a164, 0x38800130, 0x38800202,
-         nullptr, 0}, // li r4,304 -> 514
-        {"startup-restore-r28", 0x0217a250, 0x83810ab8, 0x83811228,
+         0x3ba10338, nullptr, 0},
+        {"startup-buffer-capacity", 0x0217a164, 0x38800130, 0x3880032e,
+         nullptr, 0}, // li r4,304 -> 814
+        {"startup-restore-r28", 0x0217a250, 0x83810ab8, 0x83811ca8,
          nullptr, 0},
-        {"startup-restore-r29", 0x0217a254, 0x83a10abc, 0x83a1122c,
+        {"startup-restore-r29", 0x0217a254, 0x83a10abc, 0x83a11cac,
          nullptr, 0},
-        {"startup-restore-lr", 0x0217a258, 0x80010acc, 0x8001123c,
+        {"startup-restore-lr", 0x0217a258, 0x80010acc, 0x80011cbc,
          nullptr, 0},
-        {"startup-restore-r30", 0x0217a25c, 0x83c10ac0, 0x83c11230,
+        {"startup-restore-r30", 0x0217a25c, 0x83c10ac0, 0x83c11cb0,
          nullptr, 0},
-        {"startup-restore-r31", 0x0217a264, 0x83e10ac4, 0x83e11234,
+        {"startup-restore-r31", 0x0217a264, 0x83e10ac4, 0x83e11cb4,
          nullptr, 0},
-        {"startup-frame-release", 0x0217a268, 0x38210ac8, 0x38211238,
+        {"startup-frame-release", 0x0217a268, 0x38210ac8, 0x38211cb8,
          nullptr, 0},
 
         // FUN_0217a270 repeats the same byte-result/title-id stack layout for
-        // refreshes. Apply the identical 224-byte split and 1680-byte growth.
-        {"update-frame-allocate", 0x0217a270, 0x9421f530, 0x9421edc0,
-         nullptr, 0}, // stwu r1,-0xad0(r1) -> -0x1240
-        {"update-save-registers", 0x0217a274, 0xbf610abc, 0xbf61122c,
+        // refreshes. Apply the identical 512-byte split and 4080-byte growth.
+        {"update-frame-allocate", 0x0217a270, 0x9421f530, 0x9421e340,
+         nullptr, 0}, // stwu r1,-0xad0(r1) -> -0x1cc0
+        {"update-save-registers", 0x0217a274, 0xbf610abc, 0xbf611cac,
          nullptr, 0},
-        {"update-save-lr", 0x0217a27c, 0x90010ad4, 0x90011244,
+        {"update-save-lr", 0x0217a27c, 0x90010ad4, 0x90011cc4,
          nullptr, 0},
-        {"update-title-copy-base", 0x0217a2b4, 0x3ba10130, 0x3ba10210,
+        {"update-title-copy-base", 0x0217a2b4, 0x3ba10130, 0x3ba10330,
          nullptr, 0},
         {"update-title-buffer-argument", 0x0217a31c, 0x38c10138,
-         0x38c10218, nullptr, 0},
+         0x38c10338, nullptr, 0},
         {"update-restore-registers-failure", 0x0217a33c, 0xbb610abc,
-         0xbb61122c, nullptr, 0},
+         0xbb611cac, nullptr, 0},
         {"update-restore-lr-failure", 0x0217a340, 0x80010ad4,
-         0x80011244, nullptr, 0},
+         0x80011cc4, nullptr, 0},
         {"update-frame-release-failure", 0x0217a348, 0x38210ad0,
-         0x38211240, nullptr, 0},
+         0x38211cc0, nullptr, 0},
         {"update-restore-registers-success", 0x0217a4b0, 0xbb610abc,
-         0xbb61122c, nullptr, 0},
+         0xbb611cac, nullptr, 0},
         {"update-restore-lr-success", 0x0217a4b4, 0x80010ad4,
-         0x80011244, nullptr, 0},
+         0x80011cc4, nullptr, 0},
         {"update-frame-release-success", 0x0217a4bc, 0x38210ad0,
-         0x38211240, nullptr, 0},
+         0x38211cc0, nullptr, 0},
 }};
 
 struct LoadedExecutable {
