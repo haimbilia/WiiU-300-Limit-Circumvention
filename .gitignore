@@ -1,0 +1,60 @@
+# Build output
+plugin/build/
+plugin/build-load-only/
+plugin/*.elf
+plugin/*.wps
+plugin/*.map
+plugin/dist/*.wps
+plugin/dist/*.zip
+plugin/lab/*.wps
+plugin/lab/mock-titles/
+plugin/quarantine/**
+!plugin/quarantine/README.md
+
+# Downloaded and extracted third-party tools
+tooling/downloads/
+tooling/portable/
+console-tools/packages/
+
+# Upstream reference clones
+upstream/*/
+
+# Console-owned or copyrighted inputs
+private-dumps/**
+!private-dumps/README.md
+
+# Analysis databases and generated output
+analysis/ghidra/**
+!analysis/ghidra/README.md
+analysis/notes/private/
+analysis/notes/generated/
+logs/*.log
+logs/*.txt
+logs/*.wps
+logs/**
+test-tools/**/build/
+test-tools/**/*.elf
+test-tools/**/*.wuhb
+__pycache__/
+*.pyc
+
+# Keys and console images must never enter source control
+*.key
+*.keys
+*.bin
+*.img
+*.wud
+*.wux
+*.wua
+*.rpx
+*.rpl
+
+# Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local continuation notes contain machine-specific paths and live-test state.
+/HANDOFF.md

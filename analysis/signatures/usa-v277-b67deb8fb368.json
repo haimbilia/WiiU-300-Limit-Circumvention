@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "name": "USA-v277-b67deb8fb368",
+  "activeRegion": "USA",
+  "consoleOrigin": "JPN",
+  "titleId": "0005001010040100",
+  "titleVersion": 277,
+  "menRpx": {
+    "bytes": 4181504,
+    "sha256": "b67deb8fb36889fd5451b89a5b1ce06b31abe341960c3bf1df84e9df4bbe1474"
+  },
+  "canonicalTextBase": "02000000",
+  "targetSlotCapacity": 405,
+  "patches": [
+    {
+      "name": "layout-scratch-vector",
+      "function": "FUN_0217148c",
+      "canonicalAddress": "021714bc",
+      "textOffset": "001714bc",
+      "original": "3880012c",
+      "replacement": "38800195",
+      "signature": [
+        { "delta": -4, "word": "387f001c" },
+        { "delta": 0, "word": "3880012c" },
+        { "delta": 4, "word": "38a00000" },
+        { "delta": 8, "word": "38c00004" },
+        { "delta": 12, "word": "482bc699" }
+      ]
+    },
+    {
+      "name": "layout-full-flag",
+      "function": "FUN_021736f8",
+      "canonicalAddress": "0217385c",
+      "textOffset": "0017385c",
+      "original": "2000012c",
+      "replacement": "20000195",
+      "signature": [
+        { "delta": -4, "word": "38180002" },
+        { "delta": 0, "word": "2000012c" },
+        { "delta": 4, "word": "7d800110" },
+        { "delta": 8, "word": "7d2c00d0" },
+        { "delta": 12, "word": "7fa3eb78" },
+        { "delta": 16, "word": "99390008" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+**
+!plugin/
+!plugin/Dockerfile
+!upstream/
+!upstream/libfunctionpatcher/
+!upstream/libfunctionpatcher/**
