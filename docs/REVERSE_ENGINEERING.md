@@ -25,11 +25,14 @@ own model. The known chain is:
   fixed 360-record launch tables.
 
 The current plugin raises the coherent layout path to 810 slots, dependent
-304-entry buffers to 814, and page bounds to 54. It deliberately leaves the
-two fixed account-save arrays and their import/export loops at 360 records;
+304-entry buffers to 814, and page bounds to 54. It replaces the saved page
+minimum with the stock six-page floor so the visible page count shrinks to the
+current entry count after titles are removed. It deliberately leaves the two
+fixed account-save arrays and their import/export loops at 360 records;
 extending those loops corrupts adjacent save fields. The cosmetic `PageMany`
-widget retains the real logical count of 54, while its private geometry and
-update helpers use the physical child count of 24 to map normalized progress.
+widget retains the real logical count, while its private update call uses
+`min(logical pages, 24)`. This centers one dot per page for smaller layouts and
+maps normalized progress across 24 physical children for larger layouts.
 The full checked patch list and rationale are in
 `plugin/src/patches/patch_runtime.cpp`.
 

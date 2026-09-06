@@ -28,7 +28,7 @@ constexpr uint32_t kExtendedSlotCapacity = 810;
 constexpr uint32_t kExtendedTitleBufferCapacity = kExtendedSlotCapacity + 4;
 static_assert(kExtendedTitleBufferCapacity == 0x32e);
 constexpr const char *kProfileName = "USA-v277-b67deb8fb368";
-constexpr size_t kPatchCount = 89;
+constexpr size_t kPatchCount = 85;
 constexpr uint32_t kIconEvictionFunctionOffset = 0x000cef5c;
 constexpr uint32_t kTitleListBuildFunctionOffset = 0x000d57fc;
 constexpr uint32_t kLayoutIngestFunctionOffset = 0x001716dc;
@@ -44,6 +44,7 @@ constexpr uint32_t kIconCheckFunctionOffset = 0x00247e88;
 constexpr uint32_t kModelDispatchFunctionOffset = 0x002663ac;
 constexpr uint32_t kUiOrchestratorFunctionOffset = 0x001fa5bc;
 constexpr uint32_t kSceneUpdateFunctionOffset = 0x0020cb30;
+constexpr uint32_t kPageIndicatorUpdateFunctionOffset = 0x000019e4;
 constexpr uint32_t kAssertCodeFunctionOffset = 0x00048080;
 constexpr uint32_t kPanicFunctionOffset = 0x0042ce04;
 constexpr uint32_t kIconRecordCount = 300;
@@ -143,6 +144,13 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
          0x3ba0032a, nullptr, 0},
         {"layout-reconcile-phase-four-count", 0x021731b8, 0x3b400168,
          0x3b40032a, nullptr, 0},
+        // The stock Menu preserves the largest page count previously saved in
+        // the account settings.  After a large-title test that leaves all 54
+        // pages visible even when most titles are removed.  Keep the normal
+        // six-page floor, then let the existing calculated-title-count path
+        // grow the Menu only as far as the current entries require.
+        {"layout-dynamic-page-floor", 0x021737f4, 0x7c7f1b78,
+         0x3be00006, nullptr, 0}, // mr r31,r3 -> li r31,6
         {"layout-page-upper-bound", 0x02173804, 0x2c1f0018,
          0x2c1f0036, nullptr, 0}, // 24 -> 54 pages
         {"layout-slot-product-check-one", 0x02173824, 0x2c000168,
@@ -167,19 +175,10 @@ constexpr std::array<InstructionPatch, kPatchCount> kPatches = {{
          0x3880032a, nullptr, 0},
         {"banner-vector-construction-count", 0x021643ec, 0x3ba00168,
          0x3ba0032a, nullptr, 0},
-        // Keep the PageMany widget's stored logical count at 54 so Menu-side
-        // refresh validation remains coherent.  Only its private geometry and
-        // update loops should use the 24 physical marker children.
-        {"page-indicator-even-geometry-physical-count", 0x020017cc,
-         0x819d00f0, 0x819d00fc, nullptr, 0}, // lwz r12,f0 -> fc
-        {"page-indicator-odd-geometry-physical-count", 0x02001914,
-         0x819e00f0, 0x819e00fc, nullptr, 0}, // lwz r12,f0 -> fc
-        {"page-indicator-update-initial-physical-count", 0x02001a08,
-         0x817e00f0, 0x817e00fc, nullptr, 0}, // lwz r11,f0 -> fc
-        {"page-indicator-update-loop-physical-count", 0x02001a8c,
-         0x817e00f0, 0x817e00fc, nullptr, 0}, // lwz r11,f0 -> fc
-        {"page-indicator-update-rejoin-physical-count", 0x02001ab4,
-         0x817e00f0, 0x817e00fc, nullptr, 0}, // lwz r11,f0 -> fc
+        // PageMany's update hook temporarily exposes min(logical pages, 24)
+        // to its private geometry and selection code. Keep the real logical
+        // count stored outside that call so Menu-side refresh validation sees
+        // the actual number of pages.
         // PageMany has only 24 prebuilt page-marker children. Keep the real
         // requested page count stored in the widget, but stop its cosmetic
         // child-initialization loop at the vector capacity instead of taking
@@ -352,6 +351,7 @@ PatchedFunctionHandle sIconCheckPatchHandle = 0;
 PatchedFunctionHandle sModelDispatchPatchHandle = 0;
 PatchedFunctionHandle sUiOrchestratorPatchHandle = 0;
 PatchedFunctionHandle sSceneUpdatePatchHandle = 0;
+PatchedFunctionHandle sPageIndicatorUpdatePatchHandle = 0;
 PatchedFunctionHandle sAssertCodePatchHandle = 0;
 PatchedFunctionHandle sPanicPatchHandle = 0;
 bool sFunctionPatcherInitialized = false;
@@ -561,6 +561,16 @@ DECL_FUNCTION(void, TraceSceneUpdate, int param1) {
     }
 }
 
+DECL_FUNCTION(void, DynamicPageIndicatorUpdate, int param1) {
+    auto *logicalCount = reinterpret_cast<uint32_t *>(param1 + 0xf0);
+    const uint32_t savedLogicalCount = *logicalCount;
+    if (savedLogicalCount > 24) {
+        *logicalCount = 24;
+    }
+    real_DynamicPageIndicatorUpdate(param1);
+    *logicalCount = savedLogicalCount;
+}
+
 DECL_FUNCTION(void, TraceAssertCode, uint32_t code) {
     const uint32_t call = sAssertCodeCalls++;
     if (call < 32) {
@@ -674,6 +684,8 @@ DEFINE_TRACE_PATCH(sUiOrchestratorPatch, TraceUiOrchestrator,
                    kUiOrchestratorFunctionOffset);
 DEFINE_TRACE_PATCH(sSceneUpdatePatch, TraceSceneUpdate,
                    kSceneUpdateFunctionOffset);
+DEFINE_TRACE_PATCH(sPageIndicatorUpdatePatch, DynamicPageIndicatorUpdate,
+                   kPageIndicatorUpdateFunctionOffset);
 DEFINE_TRACE_PATCH(sAssertCodePatch, TraceAssertCode,
                    kAssertCodeFunctionOffset);
 DEFINE_TRACE_PATCH(sPanicPatch, TracePanic, kPanicFunctionOffset);
@@ -695,6 +707,7 @@ void removeTracePatches() {
             &sPanicPatchHandle,
             &sAssertCodePatchHandle,
             &sSceneUpdatePatchHandle,
+            &sPageIndicatorUpdatePatchHandle,
             &sUiOrchestratorPatchHandle,
             &sModelDispatchPatchHandle,
             &sIconCheckPatchHandle,
@@ -778,6 +791,9 @@ bool installTracePatches() {
                            "ui-orchestrator") ||
         !installTracePatch(&sSceneUpdatePatch, &sSceneUpdatePatchHandle,
                            "scene-update") ||
+        !installTracePatch(&sPageIndicatorUpdatePatch,
+                           &sPageIndicatorUpdatePatchHandle,
+                           "page-indicator-update") ||
         !installTracePatch(&sAssertCodePatch, &sAssertCodePatchHandle,
                            "assert-code") ||
         !installTracePatch(&sPanicPatch, &sPanicPatchHandle,

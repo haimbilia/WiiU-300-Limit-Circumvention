@@ -6,13 +6,15 @@ icons, folders, navigation, and title launching.
 
 ## Current status
 
-`v0.2.1` expands the Menu model to 810 slots / 54 pages.
+`v0.2.2` expands the Menu model to 810 slots / 54 pages.
 
 - Verified on hardware with 801 visible items: 53 full panels and six items on
   panel 54.
 - A title launches and the complete Menu returns successfully.
+- The visible page count follows the current entries instead of preserving
+  empty pages from an earlier large-title layout (six-page minimum).
 - The stock 24-dot bar is centered and acts as a compressed progress indicator
-  over all 54 pages, advancing about once every two or three pages.
+  above 24 pages; at 24 pages or fewer it shows one dot per page.
 - Fixes a v0.2.0 state mismatch that could freeze the Menu while scrolling.
 - Returning to the Menu can take noticeably longer while hundreds of entries
   and icons are reconstructed.
@@ -30,8 +32,8 @@ closed and remain unpatched.
 
 ## Install
 
-Download `WiiUMenuTitleLimit-v0.2.1.wps` from the
-[v0.2.1 release](https://github.com/haimbilia/WiiU-300-Limit-Circumvention/releases/tag/v0.2.1)
+Download `WiiUMenuTitleLimit-v0.2.2.wps` from the
+[v0.2.2 release](https://github.com/haimbilia/WiiU-300-Limit-Circumvention/releases/tag/v0.2.2)
 and copy it to:
 
 ```text

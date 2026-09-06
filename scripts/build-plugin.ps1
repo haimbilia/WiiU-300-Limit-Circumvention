@@ -101,7 +101,7 @@ if ($Stage -eq 'LoadOnly' -or $Stage -eq 'Production') {
     if ($LASTEXITCODE -ne 0) { throw "Could not inspect $Stage ELF metadata." }
     if ($Stage -eq 'Production') {
         foreach ($requiredMetadata in @('name=Wii U Menu Title Limit',
-                                        'version=v0.2.1', 'wups=0.9.1')) {
+                                        'version=v0.2.2', 'wups=0.9.1')) {
             if (-not $metadata.Contains($requiredMetadata, [StringComparison]::Ordinal)) {
                 throw "Production build is missing metadata $requiredMetadata."
             }
@@ -133,7 +133,7 @@ if ($Stage -eq 'LoadOnly' -or $Stage -eq 'Production') {
                                        'ICInvalidateRange', 'FunctionPatcher_InitLibrary',
                                        'FunctionPatcher_AddFunctionPatch',
                                        'FunctionPatcher_RemoveFunctionPatch')
-            metadata = @('name=Wii U Menu Title Limit', 'version=v0.2.1',
+            metadata = @('name=Wii U Menu Title Limit', 'version=v0.2.2',
                          'wups=0.9.1')
         }
     }
